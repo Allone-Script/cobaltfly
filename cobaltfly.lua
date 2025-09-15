@@ -7,8 +7,8 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Создание основного фрейма
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 200, 0, 100)
-mainFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
+mainFrame.Size = UDim2.new(0, 200, 0, 150) -- Increased height for better layout
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Adjusted position
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
@@ -27,7 +27,7 @@ titleLabel.Parent = mainFrame
 -- Создание ползунка для скорости
 local speedSlider = Instance.new("TextButton")
 speedSlider.Size = UDim2.new(1, 0, 0, 30)
-speedSlider.Position = UDim2.new(0, 0, 0.35, 0)
+speedSlider.Position = UDim2.new(0, 0, 0.2, 0) -- Adjusted position
 speedSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 speedSlider.Text = "Speed: 1"
 speedSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -48,7 +48,7 @@ end)
 -- Создание кнопки включения/выключения
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0.5, 0, 0.2, 0)
-toggleButton.Position = UDim2.new(0, 0, 0.7, 0)
+toggleButton.Position = UDim2.new(0, 0, 0.5, 0) -- Adjusted position
 toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 toggleButton.Text = "Enable"
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -70,7 +70,7 @@ end)
 -- Создание галочки для обхода
 local bypassCheckBox = Instance.new("TextButton")
 bypassCheckBox.Size = UDim2.new(0.5, 0, 0.2, 0)
-bypassCheckBox.Position = UDim2.new(0.5, 0, 0.7, 0)
+bypassCheckBox.Position = UDim2.new(0.5, 0, 0.5, 0) -- Adjusted position
 bypassCheckBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 bypassCheckBox.Text = "Bypass"
 bypassCheckBox.TextColor3 = Color3.fromRGB(255, 255, 255)

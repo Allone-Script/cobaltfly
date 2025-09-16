@@ -7,8 +7,8 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Создание основного фрейма
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 200, 0, 180)
-mainFrame.Position = UDim2.new(0.5, -100, 0.5, -90)
+mainFrame.Size = UDim2.new(0, 200, 0, 210)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -105)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
@@ -27,7 +27,7 @@ titleLabel.Parent = mainFrame
 -- Создание ползунка для скорости
 local speedSlider = Instance.new("TextButton")
 speedSlider.Size = UDim2.new(1, 0, 0, 30)
-speedSlider.Position = UDim2.new(0, 0, 0.17, 0)
+speedSlider.Position = UDim2.new(0, 0, 0.14, 0)
 speedSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 speedSlider.Text = "Speed: 1"
 speedSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -47,8 +47,8 @@ end)
 
 -- Создание кнопки включения/выключения полета
 local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0.5, 0, 0.2, 0)
-toggleButton.Position = UDim2.new(0, 0, 0.39, 0)
+toggleButton.Size = UDim2.new(0.5, 0, 0.15, 0)
+toggleButton.Position = UDim2.new(0, 0, 0.33, 0)
 toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 toggleButton.Text = "Enable Fly"
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -60,8 +60,8 @@ local isFlyEnabled = false
 
 -- Создание кнопки NoClip
 local noclipButton = Instance.new("TextButton")
-noclipButton.Size = UDim2.new(0.5, 0, 0.2, 0)
-noclipButton.Position = UDim2.new(0.5, 0, 0.39, 0)
+noclipButton.Size = UDim2.new(0.5, 0, 0.15, 0)
+noclipButton.Position = UDim2.new(0.5, 0, 0.33, 0)
 noclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 noclipButton.Text = "NoClip: Off"
 noclipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -73,6 +73,72 @@ local isNoclipEnabled = false
 local noclipConnection = nil
 local originalWalkSpeed = 16
 local originalGravity = 196.2
+
+-- Создание кнопки TestClip
+local testclipButton = Instance.new("TextButton")
+testclipButton.Size = UDim2.new(0.5, 0, 0.15, 0)
+testclipButton.Position = UDim2.new(0, 0, 0.52, 0)
+testclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+testclipButton.Text = "TestClip: Off"
+testclipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+testclipButton.TextSize = 18
+testclipButton.Font = Enum.Font.SourceSans
+testclipButton.Parent = mainFrame
+
+local isTestclipEnabled = false
+local testclipConnection = nil
+
+-- Функция телепортации вперед
+local function teleportForward(distance)
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            -- Получаем направление взгляда камеры
+            local camera = workspace.CurrentCamera
+            local lookVector = camera.CFrame.LookVector
+            
+            -- Телепортируем вперед
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + (lookVector * distance)
+        end
+    end
+end
+
+-- Функция TestClip (простая телепортация вперед)
+local function toggleTestclip()
+    isTestclipEnabled = not isTestclipEnabled
+    
+    if isTestclipEnabled then
+        testclipButton.Text = "TestClip: On"
+        testclipButton.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+        
+        -- Создаем соединение для обработки телепортации
+        if testclipConnection then
+            testclipConnection:Disconnect()
+        end
+        
+        testclipConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+            if not gameProcessed and isTestclipEnabled then
+                -- Телепортация при нажатии клавиши E
+                if input.KeyCode == Enum.KeyCode.E then
+                    teleportForward(5) -- Телепортация на 5 stud'ов вперед
+                end
+            end
+        end)
+        
+    else
+        testclipButton.Text = "TestClip: Off"
+        testclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        
+        -- Отключаем соединение
+        if testclipConnection then
+            testclipConnection:Disconnect()
+            testclipConnection = nil
+        end
+    end
+end
+
+testclipButton.MouseButton1Click:Connect(toggleTestclip)
 
 -- Функция NoClip
 local function toggleNoclip()
@@ -88,21 +154,20 @@ local function toggleNoclip()
         -- Сохраняем оригинальные значения
         if humanoid then
             originalWalkSpeed = humanoid.WalkSpeed
-            humanoid.WalkSpeed = 8 -- Замедляем скорость ходьбы
+            humanoid.WalkSpeed = 3
         end
         
-        -- Замедляем гравитацию для лучшего контроля
         if workspace then
             originalGravity = workspace.Gravity
-            workspace.Gravity = 50 -- Сильно уменьшаем гравитацию
+            workspace.Gravity = 50
         end
         
-        -- Отключаем коллизии для всех частей персонажа
+        -- Отключаем коллизии
         if character then
             for _, part in pairs(character:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.CanCollide = false
-                    part.Velocity = Vector3.new(0, 0, 0) -- Убираем инерцию
+                    part.Velocity = Vector3.new(0, 0, 0)
                     part.RotVelocity = Vector3.new(0, 0, 0)
                 end
             end
@@ -115,34 +180,9 @@ local function toggleNoclip()
         
         noclipConnection = game:GetService("RunService").Stepped:Connect(function()
             if isNoclipEnabled and character then
-                -- Постоянно отключаем коллизии
                 for _, part in pairs(character:GetDescendants()) do
                     if part:IsA("BasePart") then
                         part.CanCollide = false
-                    end
-                end
-                
-                -- Дополнительный контроль скорости в NoClip
-                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                if humanoidRootPart then
-                    -- Замедляем движение для лучшего контроля
-                    humanoidRootPart.Velocity = humanoidRootPart.Velocity * 0.7
-                    humanoidRootPart.AssemblyLinearVelocity = humanoidRootPart.AssemblyLinearVelocity * 0.7
-                    
-                    -- Плавное движение в NoClip режиме
-                    if humanoid then
-                        humanoidRootPart.Velocity = humanoidRootPart.Velocity + Vector3.new(0, -2, 0) -- Легкое опускание
-                    end
-                    
-                    -- Защита от падения за карту
-                    local position = humanoidRootPart.Position
-                    if position.Y < -500 then
-                        humanoidRootPart.CFrame = CFrame.new(0, 50, 0)
-                    end
-                    
-                    -- Защита от застревания в стенах
-                    if humanoidRootPart.Velocity.Magnitude < 0.5 and humanoid then
-                        humanoidRootPart.CFrame = humanoidRootPart.CFrame + Vector3.new(0, 1, 0)
                     end
                 end
             end
@@ -152,7 +192,7 @@ local function toggleNoclip()
         noclipButton.Text = "NoClip: Off"
         noclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         
-        -- Восстанавливаем оригинальные значения
+        -- Восстанавливаем значения
         if humanoid then
             humanoid.WalkSpeed = originalWalkSpeed
         end
@@ -191,10 +231,10 @@ end)
 
 -- Создание галочки для обхода
 local bypassCheckBox = Instance.new("TextButton")
-bypassCheckBox.Size = UDim2.new(0.5, 0, 0.2, 0)
-bypassCheckBox.Position = UDim2.new(0, 0, 0.67, 0)
+bypassCheckBox.Size = UDim2.new(0.5, 0, 0.15, 0)
+bypassCheckBox.Position = UDim2.new(0.5, 0, 0.52, 0)
 bypassCheckBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-bypassCheckBox.Text = "Bypass"
+bypassCheckBox.Text = "Bypass fly"
 bypassCheckBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 bypassCheckBox.TextSize = 18
 bypassCheckBox.Font = Enum.Font.SourceSans
@@ -297,20 +337,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
--- Автоматическое отключение NoClip при смерти
-game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
-    if isNoclipEnabled then
-        -- Ждем пока персонаж полностью загрузится
-        character:WaitForChild("HumanoidRootPart")
-        wait(0.5)
-        
-        -- Перезапускаем NoClip для нового персонажа
-        isNoclipEnabled = false
-        toggleNoclip()
-    end
-end)
-
--- Автоматическое применение NoClip при возрождении
+-- Автоматическое отключение при смерти
 game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
     character:WaitForChild("Humanoid").Died:Connect(function()
         if isNoclipEnabled then
@@ -319,6 +346,18 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
                 noclipConnection:Disconnect()
                 noclipConnection = nil
             end
+            noclipButton.Text = "NoClip: Off"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        end
+        
+        if isTestclipEnabled then
+            isTestclipEnabled = false
+            if testclipConnection then
+                testclipConnection:Disconnect()
+                testclipConnection = nil
+            end
+            testclipButton.Text = "TestClip: Off"
+            testclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         end
     end)
 end)
